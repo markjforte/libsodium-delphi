@@ -292,6 +292,36 @@ begin
 end;
 
 
+//https://download.libsodium.org/doc/password_hashing/default_phf
+procedure LibSodiumPasswordHashingDemo;
+const SFunctionName = 'LibSodiumPasswordHashingDemo';
+var password: AnsiString;
+    hashed_password: array [0..ls_crypto_pwhash_STRBYTES-1] of AnsiChar;
+begin
+  WriteFunctionName(SFunctionName);
+
+  // password storage - for very sensitive passwords, you can use _SENSITIVE instead of _INTERACTIVE,
+  //   but be warned, deriving a key will take about 2 seconds on a 2.8 Ghz Core i7 CPU and requires
+  //   up to 1 gigabyte of dedicated RAM.
+  password := 'myPassword';
+  if (crypto_pwhash_str(@hashed_password, @password[1], length(password),
+                                             crypto_pwhash_OPSLIMIT_INTERACTIVE,
+                                             crypto_pwhash_MEMLIMIT_INTERACTIVE) <> 0) then begin
+    Writeln('crypto_pwhash_str: Something went wrong... [Out of Memory?]');
+   end;
+  Writeln('pwhash_str Password Key = ',hashed_password);
+  if (crypto_pwhash_str_verify(@hashed_password, @password[1], length(password)) <> 0) then
+    Writeln('crypto_pwhash_str_verify: Password and Hash MISMATCH! ['+password+']') else
+      Writeln('crypto_pwhash_str_verify: Password and Hash Match! ['+password+']');
+  password := 'MyPassword';
+  if (crypto_pwhash_str_verify(@hashed_password, @password[1], length(password)) <> 0) then
+    Writeln('crypto_pwhash_str_verify: Password and Hash MISMATCH! ['+password+']') else
+      Writeln('crypto_pwhash_str_verify: Password and Hash Match! ['+password+']');
+
+end;
+
+
+
 procedure LibSodiumRandomDemo;
 const SFunctionName = 'LibSodiumRandomDemo';
 var buf: array[0..7] of byte;
@@ -353,6 +383,9 @@ begin
   writeln;
 
   LibSodiumSalsa208sha256PasswordHashingDemo;
+  writeln;
+
+  LibSodiumPasswordHashingDemo;
   writeln;
 
   writeln('Type [Enter] to continue...');

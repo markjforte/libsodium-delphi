@@ -223,6 +223,22 @@ const
   ls_crypto_pwhash_scryptsalsa208sha256_OPSLIMIT_SENSITIVE = 33554432;
   ls_crypto_pwhash_scryptsalsa208sha256_MEMLIMIT_SENSITIVE = 1073741824;
 
+  ls_crypto_pwhash_argon2id_STRBYTES = 128;
+  ls_crypto_pwhash_argon2id_OPSLIMIT_INTERACTIVE = 2;
+  ls_crypto_pwhash_argon2id_MEMLIMIT_INTERACTIVE = 16777216;
+  ls_crypto_pwhash_argon2id_OPSLIMIT_MODERATE = 3;
+  ls_crypto_pwhash_argon2id_MEMLIMIT_MODERATE = 268435456;
+  ls_crypto_pwhash_argon2id_OPSLIMIT_SENSITIVE = 4;
+  ls_crypto_pwhash_argon2id_MEMLIMIT_SENSITIVE = 1073741824;
+
+  ls_crypto_pwhash_STRBYTES = ls_crypto_pwhash_argon2id_STRBYTES;
+  ls_crypto_pwhash_OPSLIMIT_INTERACTIVE = ls_crypto_pwhash_argon2id_OPSLIMIT_INTERACTIVE;
+  ls_crypto_pwhash_MEMLIMIT_INTERACTIVE = ls_crypto_pwhash_argon2id_MEMLIMIT_INTERACTIVE;
+  ls_crypto_pwhash_OPSLIMIT_MODERATE = ls_crypto_pwhash_argon2id_OPSLIMIT_MODERATE;
+  ls_crypto_pwhash_MEMLIMIT_MODERATE = ls_crypto_pwhash_argon2id_MEMLIMIT_MODERATE;
+  ls_crypto_pwhash_OPSLIMIT_SENSITIVE = ls_crypto_pwhash_argon2id_OPSLIMIT_SENSITIVE;
+  ls_crypto_pwhash_MEMLIMIT_SENSITIVE = ls_crypto_pwhash_argon2id_MEMLIMIT_SENSITIVE;
+
   ls_crypto_scalarmult_curve25519_BYTES = 32;
   ls_crypto_scalarmult_curve25519_SCALARBYTES = 32;
 
@@ -939,6 +955,28 @@ type
                                                     p: UINT32;
                                                     var buf: UINT8;
                                                     buflen: dwSIZE_T): Integer cdecl;
+
+  Tcrypto_pwhash_opslimit_interactive = function: dwSIZE_T cdecl;
+
+  Tcrypto_pwhash_memlimit_interactive = function: dwSIZE_T cdecl;
+
+  Tcrypto_pwhash_opslimit_moderate = function: dwSIZE_T cdecl;
+
+  Tcrypto_pwhash_memlimit_moderate = function: dwSIZE_T cdecl;
+
+  Tcrypto_pwhash_opslimit_sensitive = function: dwSIZE_T cdecl;
+
+  Tcrypto_pwhash_memlimit_sensitive = function: dwSIZE_T cdecl;
+
+  Tcrypto_pwhash_str = function(outBuf: PAnsiChar;
+                                const passwd: PAnsiChar;
+                                passwdlen: UINT64;
+                                opslimit: UINT64;
+                                memlimit: UINT64): Integer cdecl;
+
+  Tcrypto_pwhash_str_verify = function(const str: PAnsiChar;
+                                       const passwd: PAnsiChar;
+                                       passwdlen: UINT64): Integer cdecl;
 
   Tcrypto_scalarmult_bytes = function: dwSIZE_T cdecl;
 
@@ -1821,6 +1859,15 @@ var
   crypto_pwhash_scryptsalsa208sha256_str: Tcrypto_pwhash_scryptsalsa208sha256_str;
   crypto_pwhash_scryptsalsa208sha256_str_verify: Tcrypto_pwhash_scryptsalsa208sha256_str_verify;
   crypto_pwhash_scryptsalsa208sha256_ll: Tcrypto_pwhash_scryptsalsa208sha256_ll;
+  crypto_pwhash_opslimit_interactive: Tcrypto_pwhash_opslimit_interactive;
+  crypto_pwhash_memlimit_interactive: Tcrypto_pwhash_memlimit_interactive;
+  crypto_pwhash_opslimit_moderate: Tcrypto_pwhash_opslimit_moderate;
+  crypto_pwhash_memlimit_moderate: Tcrypto_pwhash_memlimit_moderate;
+  crypto_pwhash_opslimit_sensitive: Tcrypto_pwhash_opslimit_sensitive;
+  crypto_pwhash_memlimit_sensitive: Tcrypto_pwhash_memlimit_sensitive;
+  crypto_pwhash_str: Tcrypto_pwhash_str;
+  crypto_pwhash_str_verify: Tcrypto_pwhash_str_verify;
+
   crypto_scalarmult_bytes: Tcrypto_scalarmult_bytes;
   crypto_scalarmult_scalarbytes: Tcrypto_scalarmult_scalarbytes;
   crypto_scalarmult_primitive: Tcrypto_scalarmult_primitive;
@@ -2732,6 +2779,38 @@ begin
     @crypto_pwhash_scryptsalsa208sha256_ll := GetProcAddress(DLLHandle,'crypto_pwhash_scryptsalsa208sha256_ll');
   {$IFDEF WIN32}
     Assert(@crypto_pwhash_scryptsalsa208sha256_ll <> nil);
+  {$ENDIF}
+    @crypto_pwhash_opslimit_interactive := GetProcAddress(DLLHandle,'crypto_pwhash_opslimit_interactive');
+  {$IFDEF WIN32}
+    Assert(@crypto_pwhash_opslimit_interactive <> nil);
+  {$ENDIF}
+    @crypto_pwhash_memlimit_interactive := GetProcAddress(DLLHandle,'crypto_pwhash_memlimit_interactive');
+  {$IFDEF WIN32}
+    Assert(@crypto_pwhash_memlimit_interactive <> nil);
+  {$ENDIF}
+    @crypto_pwhash_opslimit_moderate := GetProcAddress(DLLHandle,'crypto_pwhash_opslimit_moderate');
+  {$IFDEF WIN32}
+    Assert(@crypto_pwhash_opslimit_moderate <> nil);
+  {$ENDIF}
+    @crypto_pwhash_memlimit_moderate := GetProcAddress(DLLHandle,'crypto_pwhash_memlimit_moderate');
+  {$IFDEF WIN32}
+    Assert(@crypto_pwhash_memlimit_moderate <> nil);
+  {$ENDIF}
+    @crypto_pwhash_opslimit_sensitive := GetProcAddress(DLLHandle,'crypto_pwhash_opslimit_sensitive');
+  {$IFDEF WIN32}
+    Assert(@crypto_pwhash_opslimit_sensitive <> nil);
+  {$ENDIF}
+    @crypto_pwhash_memlimit_sensitive := GetProcAddress(DLLHandle,'crypto_pwhash_memlimit_sensitive');
+  {$IFDEF WIN32}
+    Assert(@crypto_pwhash_memlimit_sensitive <> nil);
+  {$ENDIF}
+    @crypto_pwhash_str := GetProcAddress(DLLHandle,'crypto_pwhash_str');
+  {$IFDEF WIN32}
+    Assert(@crypto_pwhash_str <> nil);
+  {$ENDIF}
+    @crypto_pwhash_str_verify := GetProcAddress(DLLHandle,'crypto_pwhash_str_verify');
+  {$IFDEF WIN32}
+    Assert(@crypto_pwhash_str_verify <> nil);
   {$ENDIF}
     @crypto_scalarmult_bytes := GetProcAddress(DLLHandle,'crypto_scalarmult_bytes');
   {$IFDEF WIN32}
